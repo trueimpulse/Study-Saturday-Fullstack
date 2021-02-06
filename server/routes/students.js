@@ -1,11 +1,11 @@
-const router = require('express').Router();
-const { Student, Test } = require('../db/models');
+const router = require("express").Router();
+const { Student, Test } = require("../db/models");
 
 // GET /api/students
-router.get('/', async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const students = await Student.findAll({
-      include: Test
+      include: Test,
     });
     res.json(students);
   } catch (error) {
@@ -14,7 +14,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // GET /api/students/:id
-router.get('/:id', async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const student = await Student.findByPk(req.params.id);
     if (student) res.json(student);
@@ -25,17 +25,30 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /api/students
-
+router.post("/", async (req, res, next) => {
+  try {
+    // const student = await Student.create(req.body);
+    const { firstName, lastName, email } = req.body;
+    //create a new row in the db
+    const student = await Student.create(
+      { firstName, lastName, email },
+      { include: Test }
+    );
+    res.send(student);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // PUT /api/students/:id
-router.put('/:id', async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const { firstName, lastName, email } = req.body;
     const student = await Student.findByPk(req.params.id);
     const updatedStudent = await student.update({
       firstName,
       lastName,
-      email
+      email,
     });
     res.json(updatedStudent);
   } catch (error) {
@@ -44,7 +57,7 @@ router.put('/:id', async (req, res, next) => {
 });
 
 // DELETE /api/students/:id
-router.delete('/:id', async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const student = await Student.findByPk(req.params.id);
     if (student) {
